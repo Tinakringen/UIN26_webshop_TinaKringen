@@ -1,101 +1,40 @@
 import './style/lego.css'
 import { products } from './assets/legodudes'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+
+import Cart from './components/Cart'
+import Products from './components/Products'
+import ProductCard from './components/ProductCard'
+import CartItem from './components/CartItem'
+import Nav from './components/Nav'
+import Header from './components/Header'
+import CategoryTitle from './components/CategoryTitle'
 
 function App() {
 
   const [isOpen, setIsOpen] = useState(false)
+  const [cart, setCart] = useState([])
+  const [cartQuantity, setCartQuantity] = useState(0)
+  const [totalSum, setTotalSum] = useState(0)
 
-  function Header({setIsOpen}) {
-    return (
-      <header>
-        <h1>
-            <a href="index.html">
-                <img src="website_images/LD_logo.svg" alt="LEGOdudes"/>
-            </a>
-        </h1>
-        <button id="cart-button" onClick={() => setIsOpen((prev) => !prev)}>
-            <div id="cart-quantity">0</div>
-            <img src="website_images/legocart.svg" alt="Handlevogn"/>
-        </button>
-      </header>
-    )
-  }
+  console.log("Cart", cart)
 
-  function Nav() {
-    return (
-      <nav>
-            <a href="#">City</a>
-            <a href="#">Ninjago</a>
-            <a href="#">Castles & Knights</a>
-            <a href="#">Marine & Pirates</a>
-            <a href="#">Movie Characters</a>
-        </nav>
-    )
-  }
-
-  function CategoryTitle(){
-    return (<h2>Ninjago</h2>)
-  }
-
-  function Products({products}){
-    return (
-    <div id="product-list">
-      {products.map(p => <ProductCard key={p.prodid} p={p} />)}
-    </div>)
-  }
-
-  function ProductCard({p}) {
-    const handleClick = ()=>{
-      console.log("Legg i handlekurv")
-    }   
-
-    return (
-      <article className="product-card">
-        <img src={`website_images/PROD_${p.imagefile}`} alt={p.title}/>
-          <a href="#">{p.category}</a>
-          <h3>{p.title}</h3>
-          <p>kr. {p.price},-</p>
-          <button onClick={handleClick}>Legg til handlevogn</button>
-      </article>
-          )
-  }
-
-  function Cart({isOpen}){
-      return (
-        <section id="cart" className={isOpen ? "" : "hidden"}>
-            <table id="cart-items">
-              <tbody>
-                <tr>
-                  <td>Ingen varer i handlevognen enda.</td>
-                </tr>
-              </tbody>
-            </table>
-            <p>Total pris: <span id="total-price">0</span> NOK</p>
-        </section>
-      )
-    }
-
-    function CartItem(){
-      return(
-        <tr>
-          <td className="title">${product.title}</td>
-          <td className="price">${product.price} kr</td>
-          <td className="quantity">${ci.quantity}</td>
-          <td className="delete"><button onClick="deleteFromCart(${product.prodid})">X</button></td>
-        </tr>
-      )
-    }
+  useEffect(() => {
+    const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0)
+    setCartQuantity(totalQuantity)
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+    setTotalSum(total)
+  }, [cart])
 
   return (
     <div id="container">
-    <Header setIsOpen={setIsOpen} />
+    <Header setIsOpen={setIsOpen} cartQuantity={cartQuantity} />
     <Nav/>
     <main>
       <CategoryTitle />
-      <Products products={products} />
+      <Products products={products} setCart={setCart} />
     </main>
-    <Cart isOpen={isOpen} />
+    <Cart isOpen={isOpen} cart={cart} setCart={setCart} totalSum={totalSum} />
     </div>
   )  
   
